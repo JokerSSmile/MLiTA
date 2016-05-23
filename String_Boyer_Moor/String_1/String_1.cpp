@@ -1,118 +1,81 @@
 #include "stdafx.h"
+#include "BoyerMoore.h"
 #include <iostream>
-#include <vector>
-#include <string>
 #include <fstream>
-#include <unordered_map>
-#include <algorithm>
+#include <string>
 
 using namespace std;
 
-void ShiftBM(const string& needle, char* stringSymbols, size_t* shiftValues)
-{
-	size_t needlePos;
-	size_t pos = 0;
-	bool flag;
-
-	cout << "1" << endl;
-
-	for (size_t i = needle.size() - 1; i > 0; i--)
+void ReadFromFile(string& needle, string& str, vector<int>& lineSizes)
+{	
+	ifstream fin("INPUT.txt");
+	if (!fin.is_open())
 	{
-		flag = false;
-		needlePos = 0;
-		while ((needlePos < pos + 1) && (flag == false))
-		{
-			if (stringSymbols[needlePos] == needle[i])
-			{
-				flag = true;
-			}
-			needlePos++;
-		}
-		if (flag == false)
-		{
-			stringSymbols[pos] = needle[i];
-			shiftValues[pos] = needle.size() - i - 1;
-			pos++;
-		}
+		throw std::ifstream::failure("Can not open file <input.txt>");
 	}
 
-	cout << "2" << endl;
+	string strFilename;
+	getline(fin, needle);
+	fin >> strFilename;
+
+	ifstream stringFin(strFilename);
+	if (!stringFin.is_open())
+	{
+		throw std::ifstream::failure("Can not open file with string");
+	}
+	
+	string currentLine;
+	while (getline(stringFin, currentLine))
+	{
+		lineSizes.push_back(currentLine.size() + lineSizes.back() + 1);
+		str += currentLine + " ";
+	}
+
 }
 
-string BM(const string& needle, const string& str)
+void OutputPositions(const vector<int>& positions, const vector<int>& lineSizes, string str)
 {
-	char stringSymbols[256];
-	size_t shiftValues[256];
-
-	bool isSymbolInShiftTable;
-	bool isSymbolInNeedle;
-
-	size_t matchSymbolsCount;
-	size_t needlePos;
-	size_t strPos;
-
-	ShiftBM(needle, stringSymbols, shiftValues); //fill shift values
-
-	string nom = "";
-
-	if (needle.size() > str.size() || needle.size() == 0 || str.size() == 0)
+	ofstream fout("OUTPUT.txt");
+	
+	for (size_t i = 0; i < positions.size(); i++)
 	{
-		return nom;
-	}
-
-	for (strPos = 0; strPos < str.size() - needle.size() + 1; strPos++)
-	{
-		needlePos = needle.size() - 1;
-		isSymbolInNeedle = true;
-          
-		while ((needlePos > 0) && (isSymbolInNeedle == true))
+		int k = 1;
+		
+		while (positions[i] > lineSizes[k])
 		{
-			//Если не совпадает символ искомой и исходной
-			if (str[strPos + needlePos] != needle[needlePos])
-			{
-				isSymbolInNeedle = false;
-				//Если это последний символ
-				if (needlePos == needle.size() - 1)
-				{
-					matchSymbolsCount = 0;
-					isSymbolInShiftTable = false;
-					while ((matchSymbolsCount < needle.size()) && (isSymbolInShiftTable == false))
-					{
-						//Если символ есть
-						if (str[strPos + needlePos] == stringSymbols[matchSymbolsCount])
-						{
-							//Изменение флага
-							isSymbolInShiftTable = true; 
-							//Сдвиг на величину
-							strPos = strPos + shiftValues[matchSymbolsCount] - 1;
-						}
-						matchSymbolsCount++;
-					}
-					//Если не найден символ в таблице смещений
-					if (isSymbolInShiftTable == false)
-						//Сдвиг на величину искомой строки
-						strPos = strPos + needle.size() - 1;
-				}
-			}
-			needlePos--;
+			k++;
 		}
-		if (isSymbolInNeedle == true)
-			nom = nom + to_string(strPos) + " ";
+
+		fout << k << " " << positions[i] + 1 << endl;
 	}
-	if (nom.empty())
-	{
-		nom += "No.";
-	}
-	return nom;
 }
 
 int main()
 {
-	string str = "abbadabeccaabadbabbad";
-	string strFind = "abbad";
-	
-	string kek = BM(strFind, str);
+	setlocale(LC_ALL, "");
 
-	cout << kek;
+	string str;
+	string needle;
+	vector<int> lineSizes;
+	lineSizes.push_back(0);
+
+	try
+	{
+		ReadFromFile(needle, str, lineSizes);
+	}
+	catch (const std::exception& error)
+	{
+		cout << error.what() << endl;
+	}
+
+	vector<int> kek = BM::Alghorithm(needle, str);
+
+	for (auto i : kek)
+	{
+		//cout << i << " " << str[i] << endl;
+	}
+
+	OutputPositions(kek, lineSizes, str);
+
 	return 0;
 }
