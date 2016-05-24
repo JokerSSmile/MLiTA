@@ -35,18 +35,22 @@ void ReadFromFile(string& needle, string& str, vector<int>& lineSizes)
 
 void OutputPositions(const vector<int>& positions, const vector<int>& lineSizes, string str)
 {
+	cout << str<< endl;
+
 	ofstream fout("OUTPUT.txt");
 	
 	for (size_t i = 0; i < positions.size(); i++)
 	{
-		int k = 1;
+		int k = 0;
 		
-		while (positions[i] > lineSizes[k])
+		while (positions[i] < lineSizes[k])
 		{
 			k++;
+			cout << lineSizes[k] << endl;
 		}
 
-		fout << k << " " << positions[i] + 1 << endl;
+		fout << k + 1 << " ";
+		fout << positions[i] + 1 << endl;
 	}
 }
 
@@ -68,12 +72,14 @@ int main()
 		cout << error.what() << endl;
 	}
 
-	vector<int> kek = BM::Alghorithm(needle, str);
+	vector<int> kek = BM::search(str, needle);
 
-	for (auto i : kek)
-	{
-		//cout << i << " " << str[i] << endl;
-	}
+
+	//cout << kek << endl;
+	//for (auto i : kek)
+	//{
+	//	cout << i << " " << str[i] << endl;
+	//}
 
 	OutputPositions(kek, lineSizes, str);
 

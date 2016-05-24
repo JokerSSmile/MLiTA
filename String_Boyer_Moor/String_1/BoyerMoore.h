@@ -4,9 +4,11 @@
 
 using namespace std;
 
+const int NO_OF_CHARS = 256;
+static int helper[NO_OF_CHARS];
 
 namespace BM
 {
-	void Shift(const string& needle, char* stringSymbols, int* shiftValues);
-	vector<int> Alghorithm(const string& needle, const string& str);
+	void badCharHeuristic(string str, int size, int badchar[NO_OF_CHARS]);
+	vector<int> search(string txt, string pat);
 }

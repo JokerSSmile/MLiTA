@@ -2,98 +2,72 @@
 #include "BoyerMoore.h"
 #include <iostream>
 #include <array>
+#include <algorithm>
 
 namespace BM
 {
-	void Shift(const string& needle, char* stringSymbols, int* shiftValues)
+	// The preprocessing function for Boyer Moore's bad character heuristic
+	void badCharHeuristic(string str, int size, int badchar[NO_OF_CHARS])
 	{
-		
-		int needlePos;
-		int pos = 0;
-		bool isExist;
+		int i;
 
-		for (int i = needle.size() - 1; i >= 0; i--)
-		{
-			isExist = false;
-			needlePos = 0;
-			while ((needlePos < pos + 1) && (isExist == false))
-			{
+		// Initialize all occurrences as -1
+		for (i = 0; i < NO_OF_CHARS; i++)
+			badchar[i] = -1;
 
-				if (stringSymbols[needlePos] == needle[i])
-				{
-					isExist = true;
-				}
-				needlePos++;
-			}
-			if (isExist == false)
-			{
-				//cout << needle[needlePos] << endl;
-				stringSymbols[pos] = needle[i];
-				shiftValues[pos] = needle.size() - i - 2;
-				pos++;
-			}
-		}
-
-		for (int i = 0; i < 10; i++)
-		{
-			cout << stringSymbols[i] << " " << shiftValues[i] << endl;
-		}
+		// Fill the actual value of last occurrence of a character
+		for (i = 0; i < size; i++)
+			badchar[(int)str[i]] = i;
 	}
 
-	vector<int> Alghorithm(const string& needle, const string& str)
+	/* A pattern searching function that uses Bad Character Heuristic of
+	Boyer Moore Algorithm */
+	vector<int> search(string txt, string pat)
 	{
-		char stringSymbols[256];
-		int shiftValues[256] = { needle.size() };
-
-		bool isSymbolInShiftTable;
-		bool isSymbolInNeedle;
-
-		int matchSymbolsCount;
-		int strPos;
-		int needlePos;
-
-		Shift(needle, stringSymbols, shiftValues);
-
 		vector<int> positions;
 
-		if (needle.size() > str.size() || needle.size() == 0 || str.size() == 0)
-		{
-			return positions;
-		}
+		int m = pat.size();
+		int n = txt.size();
 
-		for (strPos = 0; strPos < str.size() - needle.size() + 1; strPos++)
-		{
-			needlePos = needle.size() - 1;
-			isSymbolInNeedle = true;
+		int badchar[NO_OF_CHARS];
 
-			while ((needlePos >= 0) && (isSymbolInNeedle == true))
+		/* Fill the bad character array by calling the preprocessing
+		function badCharHeuristic() for given pattern */
+		badCharHeuristic(pat, m, badchar);
+
+		int s = 0;  // s is shift of the pattern with respect to text
+		while (s <= (n - m))
+		{
+			int j = m - 1;
+
+			/* Keep reducing index j of pattern while characters of
+			pattern and text are matching at this shift s */
+			while (j >= 0 && pat[j] == txt[s + j])
+				j--;
+
+			/* If the pattern is present at current shift, then index j
+			will become -1 after the above loop */
+			if (j < 0)
 			{
-				if (str[strPos + needlePos] != needle[needlePos])
-				{	
-					isSymbolInNeedle = false;
-					if (needlePos == needle.size() - 1)
-					{
-						matchSymbolsCount = 0;
-						isSymbolInShiftTable = false;
-						while ((matchSymbolsCount < needle.size()) && (isSymbolInShiftTable == false))
-						{
-							if (str[strPos + needlePos] == stringSymbols[matchSymbolsCount])
-							{						
-								isSymbolInShiftTable = true;
-								strPos += shiftValues[matchSymbolsCount] - 1;
-							}
-							matchSymbolsCount++;
-						}
-						if (isSymbolInShiftTable == false)
-							strPos = strPos + needle.size() - 1;
-					}
-				}
-				needlePos--;
+				//printf("\n pattern occurs at shift = %d", s);
+				positions.push_back(s);
+
+				/* Shift the pattern so that the next character in text
+				aligns with the last occurrence of it in pattern.
+				The condition s+m < n is necessary for the case when
+				pattern occurs at the end of text */
+				s += (s + m < n) ? m - badchar[txt[s + m]] : 1;
+
 			}
-			if (isSymbolInNeedle == true)
-			{
-				positions.push_back(strPos);
-			}
+
+			else
+				/* Shift the pattern so that the bad character in text
+				aligns with the last occurrence of it in pattern. The
+				max function is used to make sure that we get a positive
+				shift. We may get a negative shift if the last occurrence
+				of bad character in pattern is on the right side of the
+				current character. */
+				s += max(1, j - badchar[txt[s + j]]);
 		}
 
 		return positions;
