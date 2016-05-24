@@ -1,87 +1,52 @@
 #include "stdafx.h"
-#include "BoyerMoore.h"
-#include <iostream>
-#include <fstream>
-#include <string>
+#include "stringUtils.h"
 
 using namespace std;
 
-void ReadFromFile(string& needle, string& str, vector<int>& lineSizes)
+std::string ReadFromFile(std::string& needle, std::vector<int>& lineSizes, const std::string& filename)
 {	
-	ifstream fin("INPUT.txt");
+
+	std::string str;
+
+	std::ifstream fin(filename);
 	if (!fin.is_open())
 	{
 		throw std::ifstream::failure("Can not open file <input.txt>");
 	}
 
-	string strFilename;
+	std::string strFilename;
 	getline(fin, needle);
 	fin >> strFilename;
 
-	ifstream stringFin(strFilename);
+	std::ifstream stringFin(strFilename);
 	if (!stringFin.is_open())
 	{
 		throw std::ifstream::failure("Can not open file with string");
 	}
 	
-	string currentLine;
+	std::string currentLine;
 	while (getline(stringFin, currentLine))
 	{
 		lineSizes.push_back(currentLine.size() + lineSizes.back() + 1);
 		str += currentLine + " ";
 	}
 
-}
+	return str;
+};
 
-void OutputPositions(const vector<int>& positions, const vector<int>& lineSizes, string str)
+void OutputPositions(const std::vector<int>& positions, const std::vector<int>& lineSizes)
 {
-	cout << str<< endl;
-
-	ofstream fout("OUTPUT.txt");
+	std::ofstream fout("OUTPUT.txt");
 	
 	for (size_t i = 0; i < positions.size(); i++)
 	{
 		int k = 0;
 		
-		while (positions[i] < lineSizes[k])
+		do
 		{
 			k++;
-			cout << lineSizes[k] << endl;
-		}
-
-		fout << k + 1 << " ";
-		fout << positions[i] + 1 << endl;
+		} while (positions[i] > lineSizes[k]);
+		
+		fout << k << " " << positions[i] - lineSizes[k - 1] + 1 << endl;
 	}
-}
-
-int main()
-{
-	setlocale(LC_ALL, "");
-
-	string str;
-	string needle;
-	vector<int> lineSizes;
-	lineSizes.push_back(0);
-
-	try
-	{
-		ReadFromFile(needle, str, lineSizes);
-	}
-	catch (const std::exception& error)
-	{
-		cout << error.what() << endl;
-	}
-
-	vector<int> kek = BM::search(str, needle);
-
-
-	//cout << kek << endl;
-	//for (auto i : kek)
-	//{
-	//	cout << i << " " << str[i] << endl;
-	//}
-
-	OutputPositions(kek, lineSizes, str);
-
-	return 0;
-}
+};

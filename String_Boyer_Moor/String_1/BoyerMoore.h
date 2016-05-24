@@ -4,11 +4,7 @@
 
 using namespace std;
 
-const int NO_OF_CHARS = 256;
-static int helper[NO_OF_CHARS];
+const int SIZE = 256;
 
-namespace BM
-{
-	void badCharHeuristic(string str, int size, int badchar[NO_OF_CHARS]);
-	vector<int> search(string txt, string pat);
-}
+void badSymbol(const std::string&, int badchar[SIZE]);
+vector<int> search(const std::string& str, const std::string& needle);
