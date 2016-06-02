@@ -4,7 +4,6 @@
 
 using namespace std;
 
-const int SIZE = 256;
+const short SIZE = 256;
 
-void badSymbol(const std::string&, int badchar[SIZE]);
-vector<int> search(const std::string& str, const std::string& needle);
+vector<int> Search(const std::string& str, const std::string& needle);

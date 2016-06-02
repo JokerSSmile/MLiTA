@@ -38,15 +38,22 @@ void OutputPositions(const std::vector<int>& positions, const std::vector<int>& 
 {
 	std::ofstream fout("OUTPUT.txt");
 	
-	for (size_t i = 0; i < positions.size(); i++)
+	if (positions.size() > 0)
 	{
-		int k = 0;
-		
-		do
+		for (size_t i = 0; i < positions.size(); i++)
 		{
-			k++;
-		} while (positions[i] > lineSizes[k]);
-		
-		fout << k << " " << positions[i] - lineSizes[k - 1] + 1 << endl;
+			int k = 0;
+
+			do
+			{
+				k++;
+			} while (positions[i] > lineSizes[k]);
+
+			fout << k << " " << positions[i] - lineSizes[k - 1] + 1 << endl;
+		}
+	}
+	else
+	{
+		fout << "No." << endl;
 	}
 };

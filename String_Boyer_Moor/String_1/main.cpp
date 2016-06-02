@@ -20,7 +20,7 @@ int main()
 		cout << error.what() << endl;
 	}
 
-	vector<int> findPos = search(str, needle);
+	vector<int> findPos = Search(str, needle);
 
 	OutputPositions(findPos, lineSizes);
 
