@@ -9,7 +9,7 @@ vector<vector<Node>> ReadFromFile(ifstream& fin, unsigned lineCount)
 		for (size_t k = 0; k < i; k++)
 		{
 			fin >> matrix[i][k].value;
-			matrix[i][k].startValue = make_pair((short)i, (short)k);
+			matrix[i][k].startValue = matrix[i][k].value;
 		}
 	}
 
@@ -37,7 +37,7 @@ void OutputResultToFile(const vector<vector<Node>>& matrix, unsigned lineCount)
 	fout << maximum << endl;
 	while (previous.first != 0)
 	{
-		fout << matrix[previous.first][previous.second].value << " ";
+		fout << matrix[previous.first][previous.second].startValue << " ";
 		previous = matrix[previous.first][previous.second].previousCell;
 	}
 }
@@ -48,39 +48,31 @@ void CalculatePathWithMaxWeight(vector<vector<Node>>& matrix, unsigned lineCount
 	{
 		for (size_t k = 0; k < i; k++)
 		{
-			if (k == 0)
+			if (k == 0 && i > 0)
 			{
-				if (i > 1)
-				{
-					matrix[i][k].value += matrix[i - 1][k].value;
-					matrix[i][k].previousCell = make_pair((short)i - 1, short(k));
-				}
+				matrix[i][k].value += matrix[i - 1][k].value;
+				matrix[i][k].previousCell = make_pair((short)i - 1, short(k));
 			}
 			else if (k == i)
 			{
 				matrix[i][k].value += matrix[i - 1][k - 1].value;
 				matrix[i][k].previousCell = make_pair((short)i - 1, (short)k - 1);
 			}
+			else if (matrix[i - 1][k - 1].value > matrix[i - 1][k].value)
+			{
+				matrix[i][k].value += matrix[i - 1][k - 1].value;
+				matrix[i][k].previousCell = make_pair((short)i - 1, (short)k - 1);
+			}
 			else
 			{
-				//matrix[i][k].value += max(matrix[i - 1][k - 1].value, matrix[i - 1][k].value);
-				if (matrix[i - 1][k - 1].value > matrix[i - 1][k].value)
-				{
-					matrix[i][k].value += matrix[i - 1][k - 1].value;
-					matrix[i][k].previousCell = make_pair((short)i - 1, (short)k - 1);
-				}
-				else
-				{
-					matrix[i][k].value += matrix[i - 1][k].value;
-					matrix[i][k].previousCell = make_pair((short)i - 1, (short)k);
-				}
+				matrix[i][k].value += matrix[i - 1][k].value;
+				matrix[i][k].previousCell = make_pair((short)i - 1, (short)k);
 			}
 		}
 	}
 }
 
-
-/////////////////////////// Debug tool //////////////////////////////////
+/////////////////////////// For triangle output //////////////////////////
 //void OutputMatrix(const vector<vector<Node>>& matrix, const unsigned& lineCount)
 //{
 //	for (size_t i = 0; i < lineCount + 1; i++)

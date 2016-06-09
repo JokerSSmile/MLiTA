@@ -9,8 +9,8 @@ struct Node
 	}
 
 	short value;
+	short startValue;
 	pair<short, short> previousCell;
-	pair<short, short> startValue;
 };
 
 vector<vector<Node>> ReadFromFile(ifstream& fin, unsigned lineCount);

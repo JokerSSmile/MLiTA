@@ -21,8 +21,6 @@ int main()
 
 	ifstream fin("input.txt");
 
-	string line;
-
 	unsigned lineCount = 0;
 	fin >> lineCount;
 
