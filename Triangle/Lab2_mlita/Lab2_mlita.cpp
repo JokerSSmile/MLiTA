@@ -24,17 +24,13 @@ int main()
 	string line;
 
 	unsigned lineCount = 0;
-	unsigned inLinePos = 1;
 	fin >> lineCount;
 
-	vector<vector<Node>> startMatrix;
+	vector<vector<Node>> matrix = ReadFromFile(fin, lineCount);
 
-	startMatrix = ReadFromFile(fin, lineCount);
-	vector<vector<Node>> workMatrix(startMatrix);
+	CalculatePathWithMaxWeight(matrix, lineCount);
 
-	ManipulateWithMatrix(workMatrix, lineCount);
-
-	OutputResultToFile(startMatrix, workMatrix, lineCount);
+	OutputResultToFile(matrix, lineCount);
 	
     return 0;
 }

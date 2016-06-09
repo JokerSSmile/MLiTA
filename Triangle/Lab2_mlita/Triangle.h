@@ -10,10 +10,11 @@ struct Node
 
 	short value;
 	pair<short, short> previousCell;
+	pair<short, short> startValue;
 };
 
-vector<vector<Node>> ReadFromFile(ifstream& fin, const unsigned& lineCount);
+vector<vector<Node>> ReadFromFile(ifstream& fin, unsigned lineCount);
 
-void OutputResultToFile(const vector<vector<Node>>& startMatrix, const vector<vector<Node>>& matrix, const unsigned& lineCount);
+void OutputResultToFile(const vector<vector<Node>>& matrix, unsigned lineCount);
 
-void ManipulateWithMatrix(vector<vector<Node>>& matrix, const unsigned& lineCount);
+void CalculatePathWithMaxWeight(vector<vector<Node>>& matrix, unsigned lineCount);
