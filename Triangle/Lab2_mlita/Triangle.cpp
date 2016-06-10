@@ -48,15 +48,10 @@ void CalculatePathWithMaxWeight(vector<vector<Node>>& matrix, unsigned lineCount
 	{
 		for (size_t k = 0; k < i; k++)
 		{
-			if (k == 0 && i > 0)
+			if (k == 0)
 			{
 				matrix[i][k].value += matrix[i - 1][k].value;
 				matrix[i][k].previousCell = make_pair((short)i - 1, short(k));
-			}
-			else if (k == i)
-			{
-				matrix[i][k].value += matrix[i - 1][k - 1].value;
-				matrix[i][k].previousCell = make_pair((short)i - 1, (short)k - 1);
 			}
 			else if (matrix[i - 1][k - 1].value > matrix[i - 1][k].value)
 			{
@@ -71,17 +66,3 @@ void CalculatePathWithMaxWeight(vector<vector<Node>>& matrix, unsigned lineCount
 		}
 	}
 }
-
-/////////////////////////// For triangle output //////////////////////////
-//void OutputMatrix(const vector<vector<Node>>& matrix, const unsigned& lineCount)
-//{
-//	for (size_t i = 0; i < lineCount + 1; i++)
-//	{
-//		for (size_t k = 0; k < i; k++)
-//		{
-//			cout << matrix[i][k].value << '\t';
-//		}
-//		cout << endl;
-//	}
-//}
-//////////////////////////////////////////////////////////////////////////
