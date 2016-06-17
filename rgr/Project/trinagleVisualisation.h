@@ -1,10 +1,18 @@
 #pragma once
 #include "triangleAlgorithm.h"
 
-class NodeVisualisation : public Node
+enum class AlgorithmStage
 {
-public:
-	sf::Text text;
+	FIND_MAX,
+	SHOW_PATH
 };
 
-void InitializeNodesPosition(const std::vector<std::vector<Node> >& matrix, unsigned lineCount, const sf::Font& font);
+struct NodeVisualisation : public Node
+{
+	Vector2u position;
+	Text text;
+};
+
+std::vector<NodeVisualisation> InitTriangle(std::vector<std::vector<Node>>& matrix, unsigned lineCount, const Font& font);
+
+void UpdateTriangleParts(std::vector<NodeVisualisation>& nodeVis, const std::vector<std::vector<Node>>& matrix, unsigned lineCount);

@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <tchar.h>
 
+#include <SFML/Graphics.hpp>
+
 #include <string>
 #include <vector>
 #include <iostream>
@@ -17,7 +19,10 @@
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include <sstream>
 
-#include <SFML/Graphics.hpp>
+using namespace std;
+using namespace sf;
+
 
 // TODO: Установите здесь ссылки на дополнительные заголовки, требующиеся для программы

@@ -1,14 +1,14 @@
 #pragma once
 
-class Node
+struct Node
 {
-public:
-	Node() = default;
 	short value;
 	short startValue;
-	std::pair<short, short> previousCell;
+	Vector2u previousCell;
 };
 
 std::vector<std::vector<Node>> InitializeNodeMatrix(std::ifstream& fin, unsigned lineCount);
 
-void CalculatePathWithMaxWeight(std::vector<std::vector<Node>>& matrix, unsigned lineCount);
+Vector2u CalculatePathWithMaxWeight(std::vector<std::vector<Node>>& matrix, unsigned lineCount, const sf::Vector2u& position);
+
+Vector2u FindMaxValuePosition(const std::vector<std::vector<Node>>& matrix, unsigned lineCount);

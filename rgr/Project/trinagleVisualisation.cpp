@@ -10,34 +10,37 @@ void InitText(const sf::Font& font, NodeVisualisation& vNode, const sf::Vector2f
 	vNode.text.setCharacterSize(25);
 }
 
-void InitializeNodesPosition(const std::vector<std::vector<Node>>& matrix, unsigned lineCount, const sf::Font& font)
+std::vector<NodeVisualisation> InitTriangle(std::vector<std::vector<Node>>& matrix, unsigned lineCount, const Font& font)
 {
-	//std::this_thread::sleep_for(std::chrono::nanoseconds(10000000000));
-
-
-
-	std::vector<NodeVisualisation> nodeVis;
-
-	/*
-	int rawCount = 0;
+	std::vector<NodeVisualisation> vecNodes;
 	for (size_t i = 0; i <= lineCount; i++)
 	{
-		int colomnCount = 0;
 		for (size_t k = 0; k < i; k++)
 		{
 			NodeVisualisation vNode;
 			vNode.value = matrix[i][k].value;
 			vNode.startValue = matrix[i][k].startValue;
 			vNode.previousCell = matrix[i][k].previousCell;
-			InitText(font, vNode, sf::Vector2f(i * 25.f, k * 25.f));
+			vNode.position = { i, k };
 
-			nodeVis.push_back(vNode);
+			InitText(font, vNode, sf::Vector2f(k  * 100.f + 50, i  * 100.f - 50));
 
-			colomnCount++;
+			vecNodes.push_back(vNode);
 		}
-
-		rawCount++;
 	}
-	*/
 
+	return vecNodes;
+}
+
+void UpdateTriangleParts(std::vector<NodeVisualisation>& nodeVis, const std::vector<std::vector<Node>>& matrix, unsigned lineCount)
+{
+	size_t elementCount = 0;
+	for (size_t i = 0; i <= lineCount; i++)
+	{
+		for (size_t k = 0; k < i; k++)
+		{
+			nodeVis[elementCount].text.setString(std::to_string(matrix[i][k].value));
+			elementCount++;
+		}
+	}
 }
