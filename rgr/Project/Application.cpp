@@ -2,10 +2,16 @@
 #include "Application.h"
 #include "triangleAlgorithm.h"
 #include "trinagleVisualisation.h"
+#include "tinyfiledialogs.h"
 
 CApplication::CApplication()
 {
-	Initialize();
+	m_state = AppState::GET_INPUT_FILE;
+	ifstream fin;
+	if (GetInputFile(fin))
+	{
+		Initialize(fin);
+	}
 }
 
 
@@ -26,7 +32,25 @@ void CApplication::ProcessEvents()
 	}
 }
 
-void CApplication::Initialize()
+bool CApplication::GetInputFile(ifstream& fin)
+{
+	const char *filters[] = { "*.txt" };
+	char const *result = tinyfd_openFileDialog("Select input file", "", 1, filters, "", false);
+	if (result == nullptr)
+	{
+		return false;
+	}
+	fin.open(result);
+	if (!fin.is_open())
+	{
+		tinyfd_messageBox("Error", "I/O error when reading input file", "ok", "error", 1);
+		return false;
+	}
+	m_state = AppState::DO_ALGORITHM;
+	return true;
+}
+
+void CApplication::Initialize(ifstream& fin)
 {
 	if (!m_font.loadFromFile("manteka.ttf"))
 	{
@@ -35,7 +59,6 @@ void CApplication::Initialize()
 	m_lastUpdateTime = 0;
 	m_lastUpdatetdPosition = Vector2u(0, 0);
 
-	ifstream fin("input.txt");
 	fin >> m_lineCount;
 
 	m_matrix = InitializeNodeMatrix(fin, m_lineCount);
@@ -43,11 +66,11 @@ void CApplication::Initialize()
 
 	if (!m_window.isOpen())
 	{
-		m_window.create(sf::VideoMode(m_lineCount * 100 + 50, m_lineCount * 100 + 50), "Triangle");
+		m_window.create(sf::VideoMode(m_lineCount * SHIFT_BETWEEN_TRIANGLE_NODES + 50, m_lineCount * SHIFT_BETWEEN_TRIANGLE_NODES + 50), "Triangle");
 	}
 	else
 	{
-		m_window.setSize(Vector2u(m_lineCount * 100 + 50, m_lineCount * 100 + 50));
+		m_window.setSize(Vector2u(m_lineCount * SHIFT_BETWEEN_TRIANGLE_NODES + 50, m_lineCount * SHIFT_BETWEEN_TRIANGLE_NODES + 50));
 	}
 }
 
@@ -127,6 +150,11 @@ void CApplication::UpdateShowPath()
 			m_lastUpdateTime = m_time;
 		}
 	}
+	else
+	{
+		m_state = AppState::OUTPUT_RESULT;
+		SaveResult();
+	}
 }
 
 void CApplication::Update()
@@ -144,7 +172,6 @@ void CApplication::Update()
 	default:
 		break;
 	}
-
 }
 
 void CApplication::Render()
@@ -159,10 +186,18 @@ void CApplication::Render()
 	m_window.display();
 }
 
-void CApplication::SaveResult()
+bool CApplication::SaveResult()
 {
-	ofstream fout("output.txt");
-	
+	const char *filters[] = { "*.txt" };
+	char const *result = tinyfd_openFileDialog("Select input file", "", 1, filters, "", false);
+	if (result == nullptr)
+	{
+		return false;
+	}
+
+	std::ofstream fout(result);
+	fout << m_outputResult.str();
+	return true;
 }
 
 sf::RenderWindow& CApplication::GetWindow()
