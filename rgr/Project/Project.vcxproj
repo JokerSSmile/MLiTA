@@ -157,6 +157,7 @@
     <ClInclude Include="tinyfiledialogs.h" />
     <ClInclude Include="triangleAlgorithm.h" />
     <ClInclude Include="trinagleVisualisation.h" />
+    <ClInclude Include="UserIntreface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="tinyfiledialogs.cpp" />
     <ClCompile Include="triangleAlgorithm.cpp" />
     <ClCompile Include="trinagleVisualisation.cpp" />
+    <ClCompile Include="UserIntreface.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

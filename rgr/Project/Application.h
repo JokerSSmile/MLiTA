@@ -2,15 +2,18 @@
 
 #include "triangleAlgorithm.h"
 #include "trinagleVisualisation.h"
+#include "UserIntreface.h"
 
 static const double TRIANGLE_UPDATE_TIME = 500000;
 static const unsigned SHIFT_BETWEEN_TRIANGLE_NODES = 100;
 
 enum class AppState
 {
+	MENU,
+	HELP,
 	GET_INPUT_FILE,
 	DO_ALGORITHM,
-	OUTPUT_RESULT,
+	OUTPUT_RESULT
 };
 
 class CApplication
@@ -20,7 +23,8 @@ public:
 	~CApplication();
 
 	void ProcessEvents();
-	void Initialize(ifstream& fin);
+	void InitializeFromInputDate(ifstream& fin);
+	void Initialize();
 	bool GetInputFile(ifstream& fin);
 	void Render();
 	void SetColor(const Vector2u& previousPosition);
@@ -41,6 +45,8 @@ private:
 	Vector2u m_lastUpdatetdPosition;
 	AlgorithmStage m_algorithmStage;
 	ostringstream m_outputResult;
+
+	UserIntreface m_ui;
 
 	sf::RenderWindow m_window;
 	Font m_font;

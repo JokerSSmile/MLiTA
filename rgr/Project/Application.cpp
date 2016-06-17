@@ -3,17 +3,20 @@
 #include "triangleAlgorithm.h"
 #include "trinagleVisualisation.h"
 #include "tinyfiledialogs.h"
+#include "UserIntreface.h"
 
 CApplication::CApplication()
+	:m_window(sf::VideoMode(400, 400), "Triangle"),
+	m_ui(m_window)
 {
-	m_state = AppState::GET_INPUT_FILE;
-	ifstream fin;
-	if (GetInputFile(fin))
+	m_state = AppState::MENU;
+	if (!m_font.loadFromFile("manteka.ttf"))
 	{
-		Initialize(fin);
+		throw std::exception("Invalid font file");
 	}
-}
 
+	Initialize();
+}
 
 CApplication::~CApplication()
 {
@@ -50,28 +53,31 @@ bool CApplication::GetInputFile(ifstream& fin)
 	return true;
 }
 
-void CApplication::Initialize(ifstream& fin)
+void CApplication::InitializeFromInputDate(ifstream& fin)
 {
-	if (!m_font.loadFromFile("manteka.ttf"))
-	{
-		throw std::exception("Invalid font file");
-	}
-	m_lastUpdateTime = 0;
-	m_lastUpdatetdPosition = Vector2u(0, 0);
-
 	fin >> m_lineCount;
 
 	m_matrix = InitializeNodeMatrix(fin, m_lineCount);
 	m_nodeVis = InitTriangle(m_matrix, m_lineCount, m_font);
 
-	if (!m_window.isOpen())
-	{
-		m_window.create(sf::VideoMode(m_lineCount * SHIFT_BETWEEN_TRIANGLE_NODES + 50, m_lineCount * SHIFT_BETWEEN_TRIANGLE_NODES + 50), "Triangle");
-	}
-	else
+	if (m_lineCount != 0)
 	{
 		m_window.setSize(Vector2u(m_lineCount * SHIFT_BETWEEN_TRIANGLE_NODES + 50, m_lineCount * SHIFT_BETWEEN_TRIANGLE_NODES + 50));
 	}
+
+	m_ui.Initialize(m_font, m_window.getSize());
+
+}
+
+void CApplication::Initialize()
+{
+
+	m_lastUpdateTime = 0;
+	m_lastUpdatetdPosition = Vector2u(0, 0);
+	m_state = AppState::MENU;
+
+	m_ui.Initialize(m_font, m_window.getSize());
+
 }
 
 void CApplication::SetColor(const Vector2u& previousPosition)
@@ -152,8 +158,8 @@ void CApplication::UpdateShowPath()
 	}
 	else
 	{
+		m_algorithmStage = AlgorithmStage::FIND_MAX;
 		m_state = AppState::OUTPUT_RESULT;
-		SaveResult();
 	}
 }
 
@@ -161,26 +167,72 @@ void CApplication::Update()
 {
 	m_time = static_cast<double>(m_clock.getElapsedTime().asMicroseconds());
 	
-	switch (m_algorithmStage)
+	if (m_state == AppState::MENU || m_state == AppState::HELP)
 	{
-	case AlgorithmStage::FIND_MAX:
-		UpdateFindingPath();
-		break;
-	case AlgorithmStage::SHOW_PATH:
-		UpdateShowPath();
-		break;
-	default:
-		break;
+		switch (m_ui.Update(m_window))
+		{
+		case 1:
+			m_state = AppState::GET_INPUT_FILE;
+			break;
+		case 2:
+			m_state = AppState::HELP;
+			break;
+		case 0:
+			m_state = AppState::MENU;
+		default:
+			break;
+		};
 	}
+	else if (m_state == AppState::GET_INPUT_FILE)
+	{
+		ifstream fin;
+		GetInputFile(fin);
+		InitializeFromInputDate(fin);
+		m_state = AppState::DO_ALGORITHM;
+	}
+	else if (m_state == AppState::DO_ALGORITHM)
+	{
+		switch (m_algorithmStage)
+		{
+		case AlgorithmStage::FIND_MAX:
+			UpdateFindingPath();
+			break;
+		case AlgorithmStage::SHOW_PATH:
+			UpdateShowPath();
+			break;
+		default:
+			break;
+		}
+	}
+	else if (m_state == AppState::OUTPUT_RESULT)
+	{
+		SaveResult();
+		Initialize();
+
+		m_state = AppState::MENU;
+	}
+	
 }
 
 void CApplication::Render()
 {
 	m_window.clear(sf::Color::White);
 
-	for (auto& node : m_nodeVis)
+	if (m_state == AppState::DO_ALGORITHM || m_state == AppState::OUTPUT_RESULT)
 	{
-		m_window.draw(node.text);
+		for (auto& node : m_nodeVis)
+		{
+			m_window.draw(node.text);
+		}
+	}
+
+	if (m_state == AppState::MENU)
+	{
+		m_ui.Draw(m_window);
+	}
+	else if (m_state == AppState::HELP)
+	{
+		m_ui.DrawHelp(m_window);
 	}
 
 	m_window.display();
@@ -189,7 +241,7 @@ void CApplication::Render()
 bool CApplication::SaveResult()
 {
 	const char *filters[] = { "*.txt" };
-	char const *result = tinyfd_openFileDialog("Select input file", "", 1, filters, "", false);
+	char const *result = tinyfd_openFileDialog("Select output file", "", 1, filters, "", false);
 	if (result == nullptr)
 	{
 		return false;

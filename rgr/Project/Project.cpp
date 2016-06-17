@@ -6,16 +6,14 @@
 
 int main()
 {
+	setlocale(LC_ALL, "Russian");
 	CApplication app;
 
 	while (app.GetWindow().isOpen())
 	{
-		app.ProcessEvents();
-		if (app.m_state == AppState::DO_ALGORITHM)
-		{
-			app.Update();
-			app.Render();
-		}
+		app.ProcessEvents();	
+		app.Update();
+		app.Render();
 	}
 
 	return 0;
